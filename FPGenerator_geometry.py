@@ -1,1 +1,8 @@
-"""File containing all of the geometry for the Floor Plan Generator."""
+"""FPGenerator_geometry.py - Geometry builders for Floor Plan Generator.
+
+Each function creates one type of floor plan element and returns the MAYA node
+name(s). No materials or scene logic included.
+
+Usage:
+  Import FPGenerator_geometry as geo
+  geo.create
