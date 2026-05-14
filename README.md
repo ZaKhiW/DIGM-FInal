@@ -3,15 +3,16 @@
 ## What it Does
 A Maya tool that generates a floor layout and loose model for a general interior design. The purpose is to generate a general base foundation that can be edited by modelers. Allowing them to be able to skip the first few steps and create something without having to start from scratch.
 
-## Planned Features / Pipeline
+# Planned Features / Pipeline
 - [ ] Core Geometry Functions
 - [ ] Data Driven Loops
 - [ ] Test Week (Make sure everything is functioning properly before continuing)
 - [ ] Begin Randomization creation
 - [ ] Final Touches / Editing
 
-## Functions I Need TO Write
-# FloorPlan_geometry.py
+# Project Structure
+
+### FloorPlan_geometry.py
 - create_wall
 - create_room
 - room_count
@@ -19,12 +20,28 @@ A Maya tool that generates a floor layout and loose model for a general interior
 - wall_height
 - wall_thickness
 
-## How To Run
+### main.py
+
+- Entry point, config, generate_floor_plan()
+
+### README.md
+
+- Current File
+
+
+# Functions
+
+### FloorPlan_geometry.py
+
+- 
+
+
+# How To Run
 
 - Open Maya
 - Open Script Editor
 - Paste code into script editor
 
-### Author
+# Author
 
 Za'khi Woods
