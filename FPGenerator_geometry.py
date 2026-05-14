@@ -9,3 +9,5 @@ Usage:
   geo.create_wall()
 
 """
+
+import maya.cmds as cmds
