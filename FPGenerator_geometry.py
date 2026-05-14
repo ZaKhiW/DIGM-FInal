@@ -5,5 +5,6 @@ name(s). No materials or scene logic included.
 
 Usage:
   Import FPGenerator_geometry as geo
-  geo.create
+  geo.create_wall()
 
+"""
