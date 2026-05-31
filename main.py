@@ -7,12 +7,14 @@ containing the entirety of the code meant for the Floor Plan Generator.
 Assembles complete Floor Plan Generator.
 """
 
-import os
-import sys
 import maya.cmds as cmds
+import random
+import json
 
+## Floor Plan Generator ##
 
 class FloorPlanGenerator:
+    
     def __init__(self,
                  width=40,
                  depth=40,
@@ -139,17 +141,266 @@ class FloorPlanGenerator:
 
         self.generate_hallways()
 
+def save_settings(filepath, settings):
+    with open(filepath, "w") as f:
+        json.dump(settings, f, indent=4)
 
-gen = FloorPlanGenerator(
-    width=60,
-    depth=60,
-    room_count=12,
-    min_room=5,
-    max_room=14,
-    wall_height=10,
-    wall_thickness=0.6,
-    hallway_chance=0.5,
-    seed=random.randint(0, 9999)
-)
 
-gen.build()
+def load_settings(filepath):
+    with open(filepath, "r") as f:
+        return json.load(f)
+
+## FloorPlanGenerator UI ##
+
+class FloorPlanGeneratorUI:
+
+    WINDOW_NAME = "FloorPlanGeneratorUI"
+
+    def __init__(self):
+        self.build_ui()
+
+    def build_ui(self):
+
+        if cmds.window(self.WINDOW_NAME, exists=True):
+            cmds.deleteUI(self.WINDOW_NAME)
+
+        cmds.window(
+            self.WINDOW_NAME,
+            title="Procedural Floor Plan Generator",
+            widthHeight=(350, 500)
+        )
+
+        cmds.columnLayout(
+            adjustableColumn=True,
+            rowSpacing=5
+        )
+
+        self.width_field = cmds.intFieldGrp(
+            label="Width",
+            value1=60
+        )
+
+        self.depth_field = cmds.intFieldGrp(
+            label="Depth",
+            value1=60
+        )
+
+        self.room_count_field = cmds.intFieldGrp(
+            label="Room Count",
+            value1=12
+        )
+
+        self.min_room_field = cmds.intFieldGrp(
+            label="Min Room Size",
+            value1=5
+        )
+
+        self.max_room_field = cmds.intFieldGrp(
+            label="Max Room Size",
+            value1=14
+        )
+
+        self.wall_height_field = cmds.floatFieldGrp(
+            label="Wall Height",
+            value1=10
+        )
+
+        self.wall_thickness_field = cmds.floatFieldGrp(
+            label="Wall Thickness",
+            value1=0.6
+        )
+
+        self.hallway_field = cmds.floatFieldGrp(
+            label="Hallway Chance",
+            value1=0.5
+        )
+
+        cmds.separator(height=15)
+
+        cmds.button(
+            label="Generate Floor Plan",
+            height=40,
+            command=lambda *_: self.generate()
+        )
+
+        cmds.button(
+            label="Save Settings",
+            height=30,
+            command=lambda *_: self.save_json()
+        )
+
+        cmds.button(
+            label="Load Settings",
+            height=30,
+            command=lambda *_: self.load_json()
+        )
+
+        cmds.showWindow(self.WINDOW_NAME)
+
+    def get_settings(self):
+
+        return {
+
+            "width":
+                cmds.intFieldGrp(
+                    self.width_field,
+                    q=True,
+                    value1=True
+                ),
+
+            "depth":
+                cmds.intFieldGrp(
+                    self.depth_field,
+                    q=True,
+                    value1=True
+                ),
+
+            "room_count":
+                cmds.intFieldGrp(
+                    self.room_count_field,
+                    q=True,
+                    value1=True
+                ),
+
+            "min_room":
+                cmds.intFieldGrp(
+                    self.min_room_field,
+                    q=True,
+                    value1=True
+                ),
+
+            "max_room":
+                cmds.intFieldGrp(
+                    self.max_room_field,
+                    q=True,
+                    value1=True
+                ),
+
+            "wall_height":
+                cmds.floatFieldGrp(
+                    self.wall_height_field,
+                    q=True,
+                    value1=True
+                ),
+
+            "wall_thickness":
+                cmds.floatFieldGrp(
+                    self.wall_thickness_field,
+                    q=True,
+                    value1=True
+                ),
+
+            "hallway_chance":
+                cmds.floatFieldGrp(
+                    self.hallway_field,
+                    q=True,
+                    value1=True
+                )
+        }
+
+    def generate(self):
+
+        settings = self.get_settings()
+
+        gen = FloorPlanGenerator(
+            width=settings["width"],
+            depth=settings["depth"],
+            room_count=settings["room_count"],
+            min_room=settings["min_room"],
+            max_room=settings["max_room"],
+            wall_height=settings["wall_height"],
+            wall_thickness=settings["wall_thickness"],
+            hallway_chance=settings["hallway_chance"],
+            seed=random.randint(0, 9999)
+        )
+
+        gen.build()
+
+## JSON ##    
+
+    def save_json(self):
+
+        filepath = cmds.fileDialog2(
+            fileMode=0,
+            caption="Save Floor Plan Settings",
+            fileFilter="JSON Files (*.json)"
+        )
+
+        if not filepath:
+            return
+
+        save_settings(
+            filepath[0],
+            self.get_settings()
+        )
+
+        print("Settings saved:", filepath[0])
+
+    def load_json(self):
+
+        filepath = cmds.fileDialog2(
+            fileMode=1,
+            caption="Load Floor Plan Settings",
+            fileFilter="JSON Files (*.json)"
+        )
+
+        if not filepath:
+            return
+
+        settings = load_settings(filepath[0])
+
+        cmds.intFieldGrp(
+            self.width_field,
+            e=True,
+            value1=settings["width"]
+        )
+
+        cmds.intFieldGrp(
+            self.depth_field,
+            e=True,
+            value1=settings["depth"]
+        )
+
+        cmds.intFieldGrp(
+            self.room_count_field,
+            e=True,
+            value1=settings["room_count"]
+        )
+
+        cmds.intFieldGrp(
+            self.min_room_field,
+            e=True,
+            value1=settings["min_room"]
+        )
+
+        cmds.intFieldGrp(
+            self.max_room_field,
+            e=True,
+            value1=settings["max_room"]
+        )
+
+        cmds.floatFieldGrp(
+            self.wall_height_field,
+            e=True,
+            value1=settings["wall_height"]
+        )
+
+        cmds.floatFieldGrp(
+            self.wall_thickness_field,
+            e=True,
+            value1=settings["wall_thickness"]
+        )
+
+        cmds.floatFieldGrp(
+            self.hallway_field,
+            e=True,
+            value1=settings["hallway_chance"]
+        )
+
+        print("Settings loaded:", filepath[0])
+
+## UI ##
+
+FloorPlanGeneratorUI()
+
+
