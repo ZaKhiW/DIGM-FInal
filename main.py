@@ -39,6 +39,7 @@ class FloorPlanGenerator:
             random.seed(seed)
 
         self.rooms = []
+        self.main_group = None
 
     def clear_scene(self):
         objs = cmds.ls("floorGen_*")
@@ -59,7 +60,10 @@ class FloorPlanGenerator:
             z,
             wall
         )
-
+        
+        if self.main_group:
+            cmds.parent(wall, self.main_group)
+            
     def create_floor(self):
         floor = cmds.polyPlane(
             w=self.width,
@@ -68,6 +72,9 @@ class FloorPlanGenerator:
         )[0]
 
         cmds.move(0, 0, 0, floor)
+
+        if self.main_group:
+            cmds.parent(floor, self.main_group)
 
     def room_overlaps(self, x, z, w, d):
         for rx, rz, rw, rd in self.rooms:
@@ -133,6 +140,9 @@ class FloorPlanGenerator:
 
     def build(self):
         self.clear_scene()
+        
+        self.main_group = cmds.group(em=True, name="floorGen_Group")
+        
         self.create_floor()
         self.generate_rooms()
 
@@ -140,6 +150,7 @@ class FloorPlanGenerator:
             self.build_room(*room)
 
         self.generate_hallways()
+        
 
 def save_settings(filepath, settings):
     with open(filepath, "w") as f:
@@ -402,5 +413,3 @@ class FloorPlanGeneratorUI:
 ## UI ##
 
 FloorPlanGeneratorUI()
-
-
